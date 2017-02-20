@@ -2,16 +2,19 @@
 f00x = (typeof (f00x) != "undefined" && f00x instanceof Object) ? f00x : {};
 f00x.swap = function () {
     this.eventLoadEnd = new f00x.event('LoadEnd');
-    this.name = 'f00x.swap'
-
+     this.eventSendFilesBeforeProgressBar = new f00x.event('BeforeSendFiles');
+    this.name = 'f00x.swap';
+   f00x.swap.prototype.stackAboutFiles = [];
     return this;
 };
-f00x.swap.prototype.stackAboutFiles = [];
+f00x.swap.prototype.stackAboutFiles = false;
 f00x.swap.prototype.url = '/'
 
 f00x.swap.prototype.eventLoadEnd = false;
+f00x.swap.prototype.eventSendFilesBeforeProgressBar=false;
 f00x.swap.prototype.fileSourceInput = false;
 f00x.swap.prototype.progressBarConainerElement = false;
+
 /*-----*/
 
 f00x.swap.prototype.sendPostFromFormData = function (formData)
@@ -109,6 +112,9 @@ f00x.swap.prototype.sendFiles = function (fileSourceInput, isSerialSending)
 
         progressBar.setName(file.name + '  Размер~(<tt>' + (file.size / 1024).toFixed(2) + 'KByte</tt>)');
         progressBar.totalValue = file.size;
+
+        self.eventSendFilesBeforeProgressBar.call(progressBar, file);
+
         self.progressBarConainerElement.appendChild(progressBar.rootDivElement);
         if (isSerialSending)
         {
@@ -125,7 +131,7 @@ f00x.swap.prototype.sendFiles = function (fileSourceInput, isSerialSending)
             self.sendFile(file, fileNameInput, progressBar);
         }
 
-      
+
 
     });
     if (isSerialSending) {
@@ -330,13 +336,14 @@ f00x.event = function (name, self)
 {
     this.name = name;
     this.scopeCall = self;
+    this.listAction = []; 
 }
-f00x.event.prototype.name;
-f00x.event.prototype.listAction = [];
+f00x.event.prototype.name=false;
+f00x.event.prototype.listAction = false;
 f00x.event.prototype.scopeCall = false;
 f00x.event.prototype.addAction = function (Action) {
     if (Action instanceof Function) {
-        this.listAction.push = Action;
+        this.listAction.push(Action);
         return true;
     }
     return false;
