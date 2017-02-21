@@ -43,9 +43,9 @@ f00x.swap.prototype.sendPostFromObject = function (obj)
 f00x.swap.prototype.sendGetFromObject = function (obj)
 {
     if (obj instanceof Object)
-        url = this.getStringGET(obj, this.url);
+        this.url = this.getStringGET(obj, this.url);
     var link = new XMLHttpRequest();
-    link.open("GET", url, true);
+    link.open("GET", this.url, true);
 
     var self = this;
     link.addEventListener("loadend", function () {
