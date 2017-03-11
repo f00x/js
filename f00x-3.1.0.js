@@ -1,4 +1,4 @@
-/*16.02.2017 f00x autor:f00x mail:httpf00x@gmail.com*/
+/*11.03.2017 f00x autor:f00x mail:httpf00x@gmail.com*/
 f00x = (typeof (f00x) != "undefined" && f00x instanceof Object) ? f00x : {};
 f00x.swap = function () {
     this.eventLoadEnd = new f00x.event('LoadEnd');
@@ -358,5 +358,56 @@ f00x.event.prototype.call = function () {
             Action.apply(this.scopeCall, arguments);
         }
     }
+}
+
+f00x.scroll = {};
+f00x.scroll.vertical = {};
+f00x.scroll.vertical.toTop = function ()
+{
+    this.userLevelScroll = this.getScroll();
+    //scrollTo(0,document.body.scrollLeft) = 0;
+    this.setScroll(0);
+}
+f00x.scroll.vertical.toBottomLevel = function ()
+{
+    if (this.userLevelScroll > 0)
+    {
+        if (this.getScroll() >= this.userLevelScroll)
+            this.toBottom();
+        else
+            this.setScroll(this.userLevelScroll);
+    } else
+        this.toBottom();
+}
+f00x.scroll.vertical.toBottom = function ()
+{ //alert('toBottom')
+    this.setScroll(this.getHeight());
+
+}
+f00x.scroll.vertical.getHeight = function ()
+{
+    var scrollHeight = Math.max(
+            document.body.scrollHeight, document.documentElement.scrollHeight,
+            document.body.offsetHeight, document.documentElement.offsetHeight,
+            document.body.clientHeight, document.documentElement.clientHeight
+            );
+    return scrollHeight;
+}
+f00x.scroll.vertical.getScroll = function ()
+{
+    return window.pageYOffset || document.documentElement.scrollTop;
+}
+f00x.scroll.vertical.setScroll = function (value)
+{
+    window.scrollTo(f00x.scroll.horisontal.getScroll(),value)
+}
+f00x.scroll.horisontal = {};
+f00x.scroll.horisontal.getScroll=function()
+{
+    return window.pageXOffset || document.documentElement.scrollLeft;
+}
+f00x.scroll.horisontal.setScroll = function (value)
+{
+    window.scrollTo(value,f00x.scroll.vertical.getScroll())
 }
 
