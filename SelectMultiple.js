@@ -8,7 +8,12 @@ f00x = (typeof (f00x) != "undefined" && f00x instanceof Object) ? f00x : {};
 f00x.SelectMultiple = function (elementSelect, elementLabel, callBackTextItem, isVisibleEditListButton, isVisibleAddButton) {
 
     f00x.element.hide(elementSelect);
-    this.callBackTextItem = callBackTextItem;
+    if (callBackTextItem instanceof Function) {
+        this.callBackTextItem = callBackTextItem;
+    } else
+    {
+        this.callBackTextItem = this.defaultCallBackTextItem;
+    }
     this.elementSelect = elementSelect;
     this.elementBase = this.createElementBase();
     this.elementBody = this.createElementBody();
@@ -50,7 +55,7 @@ f00x.SelectMultiple = function (elementSelect, elementLabel, callBackTextItem, i
     this.elementBody.appendChild(this.elementList);
     this.elementBase.appendChild(this.elementBody);
     this.initListOptions()
-    this.elementSelect.parentNode.insertBefore(this.elementBase,this.elementSelect);
+    this.elementSelect.parentNode.insertBefore(this.elementBase, this.elementSelect);
 }
 f00x.SelectMultiple.prototype.elementSelect = false;
 f00x.SelectMultiple.prototype.elementBase = false;
@@ -95,7 +100,7 @@ f00x.SelectMultiple.prototype.createElementItem = function (key, text)
     elementItem.addEventListener('click', function () {
         self.selectByKey(key)
     })
-    elementItem.innerHTML=text;
+    elementItem.innerHTML = text;
     return elementItem
 
 }
@@ -107,13 +112,13 @@ f00x.SelectMultiple.prototype.createElementButtonGroup = function ()
 }
 f00x.SelectMultiple.prototype.createElementButtonAdd = function ()
 {
-var elementButton = document.createElement('button');
+    var elementButton = document.createElement('div');
     elementButton.classList.add('btn', 'btn-success', 'glyphicon', 'glyphicon-plus');
     return elementButton
 }
 f00x.SelectMultiple.prototype.createElementButtonEditList = function ()
 {
-var elementButton = document.createElement('button');
+    var elementButton = document.createElement('div');
     elementButton.classList.add('btn', 'btn-primary', 'glyphicon', 'glyphicon-list');
     return elementButton
 }
@@ -123,8 +128,8 @@ f00x.SelectMultiple.prototype.createElementBase = function ()
     element.classList.add('panel', 'panel-default');
     return element;
 }
-f00x.SelectMultiple.prototype.createElementBody = function (){
-     var elementBody = document.createElement('div');
+f00x.SelectMultiple.prototype.createElementBody = function () {
+    var elementBody = document.createElement('div');
     elementBody.classList.add('panel-body');
     return elementBody;
 }
@@ -145,7 +150,8 @@ f00x.SelectMultiple.prototype.createElementHead = function ()
     return elementHead
 }
 f00x.SelectMultiple.prototype.selectByKey = function (key)
-{   console.log(this);
+{
+    console.log(this);
     console.log(key);
     if (!this.elementSelect.childNodes[key].selected) {
         this.elementSelect.childNodes[key].selected = true;
@@ -158,3 +164,6 @@ f00x.SelectMultiple.prototype.selectByKey = function (key)
 }
 
 
+f00x.SelectMultiple.prototype.defaultCallBackTextItem=function(element){
+    return element.innerHTML;
+}
