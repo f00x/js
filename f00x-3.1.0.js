@@ -413,3 +413,16 @@ f00x.scroll.horisontal.setScroll = function (value)
     window.scrollTo(value, f00x.scroll.vertical.getScroll())
 }
 
+f00x.element={}
+f00x.element.show = function (element)
+{
+    element.classList.remove('hidden');
+    element.classList.add('show');
+
+}
+f00x.element.hide = function (element)
+{
+    element.classList.remove('show')
+    element.classList.add('hidden');
+
+}
