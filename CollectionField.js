@@ -172,7 +172,7 @@ f00x.CollectionField.prototype.createMenuItem = function (textItem, key)
 
     var elementButtonEdit = document.createElement('div');
     elementButtonEdit.classList.add('btn', 'btn-primary', 'glyphicon', 'glyphicon-pencil');
-    self = this;
+    var self = this;
     elementButtonEdit.addEventListener('click', function () {
         self.editClick(this.parentNode.parentNode)
     })
@@ -236,6 +236,7 @@ f00x.CollectionField.prototype.addClick = function ()
     this.listMenuItem[numberNewElement] = menuItem;
     this.setNumberItemCollection(numberNewElement, 'new' + numberNewElement);
     this.editClick(menuItem);
+    
 }
 
 f00x.CollectionField.prototype.saveAndCloseClick = function (elementFormItem)
