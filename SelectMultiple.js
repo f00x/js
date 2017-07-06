@@ -5,8 +5,8 @@
  *
  */
 f00x = (typeof (f00x) != "undefined" && f00x instanceof Object) ? f00x : {};
-f00x.SelectMultiple = function (elementSelect, elementLabel, callBackTextItem, isVisibleEditListButton, isVisibleAddButton) {
-
+f00x.SelectMultiple = function (elementSelect, elementLabel, callBackTextItem, isVisibleEditListButton, isVisibleAddButton,isMouseCtrlActive) {
+    this.isMouseCtrlActive=isMouseCtrlActive;
     f00x.element.hide(elementSelect);
     if (callBackTextItem instanceof Function) {
         this.callBackTextItem = callBackTextItem;
@@ -72,6 +72,7 @@ f00x.SelectMultiple.prototype.eventAddClick = false;
 f00x.SelectMultiple.prototype.eventEditListButtonClick = false;
 
 f00x.SelectMultiple.prototype.callBackTextItem = false;
+f00x.SelectMultiple.prototype.isMouseCtrlActive=false;
 
 f00x.SelectMultiple.prototype.initListOptions = function ()
 {
@@ -100,8 +101,23 @@ f00x.SelectMultiple.prototype.createElementItem = function (key, text)
     elementItem.addEventListener('click', function () {
         self.selectByKey(key)
     })
+    if(this.isMouseCtrlActive){
+        elementItem.addEventListener('mouseover', this.mouseGtrlSelection);
+    }
     elementItem.innerHTML = text;
     return elementItem
+
+}
+f00x.SelectMultiple.prototype.mouseGtrlSelection = function (event)
+{
+    if (event.target != this)
+                    return false;
+                if (this.contains(event.relatedTarget))
+                    return false;
+                if (event.ctrlKey) {
+                    this.click()
+                }
+                
 
 }
 f00x.SelectMultiple.prototype.createElementButtonGroup = function ()

@@ -4,7 +4,7 @@
 /*22.07.2017 f00x autor:f00x mail:httpf00x@gmail.com*/
 
 f00x = (typeof (f00x) != "undefined" && f00x instanceof Object) ? f00x : {};
-f00x.CollectionField = function (boxListElement, callBackTextMenuItem, labelForm, callBackDelete) {
+f00x.CollectionField = function (boxListElement, callBackTextMenuItem, labelForm, callBackDelete, callBackError) {
 //    this.eventLoadEnd = new f00x.event('LoadEnd');
     this.labelForm = labelForm;
 
@@ -19,7 +19,7 @@ f00x.CollectionField = function (boxListElement, callBackTextMenuItem, labelForm
 
     this.elementListBox = boxListElement;
     this.name = 'f00x.CollectionField';
-    this.init(callBackTextMenuItem, callBackDelete);
+    this.init(callBackTextMenuItem, callBackDelete, callBackError);
     return this;
 }
 f00x.CollectionField.prototype.name = false;
@@ -34,12 +34,19 @@ f00x.CollectionField.prototype.eventFormSaveAndClose = false;
 f00x.CollectionField.prototype.eventAddForm = false;
 
 f00x.CollectionField.prototype.callBackDelete = false;
-
-f00x.CollectionField.prototype.init = function (callBackTextMenuItem, callBackDelete) {
+f00x.CollectionField.prototype.callBackError = false;
+f00x.CollectionField.prototype.init = function (callBackTextMenuItem, callBackDelete, callBackError) {
     this.distributionElements();
     this.baseElementInit();
     this.elementMenu = this.createMenu();
     this.listMenuItem = [];
+    if (callBackError && callBackError.call) {
+        this.callBackError = callBackError;
+    } else {
+        this.callBackError = function () {
+            alert('Ошибка заполнения')
+        };
+    }
     if (callBackDelete && callBackDelete.call) {
         this.callBackDelete = callBackDelete;
     } else
@@ -193,7 +200,7 @@ f00x.CollectionField.prototype.createMenuItem = function (textItem, key)
 }
 f00x.CollectionField.prototype.editClick = function (elementMenuItem)
 {
-    var key = elementMenuItem.getAttribute('data-collection-key');
+    var key = this.getKeyItemByElementFormOrMenu(elementMenuItem);
 
     f00x.element.show(this.listChildrenElementForms[key]);
     f00x.element.hide(this.elementMenu);
@@ -201,7 +208,7 @@ f00x.CollectionField.prototype.editClick = function (elementMenuItem)
 }
 f00x.CollectionField.prototype.deleteClick = function (elementMenuItem)
 {
-    var key = elementMenuItem.getAttribute('data-collection-key');
+    var key = this.getKeyItemByElementFormOrMenu(elementMenuItem);
     this.elementMenu.removeChild(elementMenuItem);
 
     this.elementListBox.removeChild(this.listChildrenElementForms[key]);
@@ -236,23 +243,29 @@ f00x.CollectionField.prototype.addClick = function ()
     this.listMenuItem[numberNewElement] = menuItem;
     this.setNumberItemCollection(numberNewElement, 'new' + numberNewElement);
     this.editClick(menuItem);
-    
+
 }
 
 f00x.CollectionField.prototype.saveAndCloseClick = function (elementFormItem)
 {
 
-    f00x.element.hide(elementFormItem);
+    
     this.eventFormSaveAndClose.call(elementFormItem);
-
+    
+    if (!this.validateItemForm(this.getKeyItemByElementFormOrMenu(elementFormItem))) {
+        this.callBackError();
+    }
+    f00x.element.hide(elementFormItem);
     this.updateMenuItem(elementFormItem);
     f00x.element.show(this.elementMenu);
     this.elementButtonAdd.disabled = false;
+    
+
 
 }
 f00x.CollectionField.prototype.updateMenuItem = function (elementFormItem)
 {
-    var key = elementFormItem.getAttribute('data-collection-key');
+    var key = this.getKeyItemByElementFormOrMenu(elementFormItem);
     var text = this.callBackTextMenuItem(elementFormItem);
 
 
@@ -299,23 +312,71 @@ f00x.CollectionField.prototype.disabledMenuItem = function (elementMenuItem) {
 }
 
 
-f00x.CollectionField.prototype.createPostNameFieldList = function (listElementData,formName) {
+f00x.CollectionField.prototype.createPostNameFieldList = function (listElementData, formName) {
     listElementData.forEach(function (elementData) {
         var name = elementData.getAttribute('name');
         var searchResult = /\[(.[^\]]+)\]$/g.exec(name)
-        if (searchResult){
-        var nameField = searchResult[0];
-        var postItemName =  formName+ nameField;
-        elementData.setAttribute('data-post-name', postItemName);}
+        if (searchResult) {
+            var nameField = searchResult[0];
+            var postItemName = formName + nameField;
+            elementData.setAttribute('data-post-name', postItemName);
+        }
     });
     return listElementData;
 }
 
 f00x.CollectionField.prototype.getObjectFieldListByPostName = function (listElementData) {
-    var postObject={};
+    var postObject = {};
     listElementData.forEach(function (elementData) {
-        var postItemName=elementData.getAttribute('data-post-name');
+        var postItemName = elementData.getAttribute('data-post-name');
         postObject[postItemName] = elementData.value;
     });
     return postObject;
 }
+f00x.CollectionField.prototype.addErrorItem = function (keyElement) {
+    this.listMenuItem[keyElement].classList.add('list-group-item-danger')
+
+}
+f00x.CollectionField.prototype.removeErrorItem = function (keyElement) {
+    this.listMenuItem[keyElement].classList.remove('list-group-item-danger')
+
+}
+f00x.CollectionField.prototype.validateAllItemsForm = function () {
+    var self = this;
+    var validate = true;
+    this.listChildrenElementForms.forEach(function (element, key) {
+
+        if (!self.validateItemForm(key)) {
+            validate = false;
+        }
+    });
+
+    return validate;
+}
+f00x.CollectionField.prototype.validateItemForm = function (key)
+{
+    var element = this.listChildrenElementForms[key];
+    var InputArray = Array.from(element.querySelectorAll('[required]'));
+
+    var valid = true
+    InputArray.some(function (element) {
+        if (!element.validity.valid) {
+            valid = false;
+            return true;
+        }
+    })
+//        console.log(element);
+    if (!valid) {
+//            console.log(element);
+        this.addErrorItem(key);
+
+    } else {
+        this.removeErrorItem(key);
+    }
+    return valid;
+}
+f00x.CollectionField.prototype.getKeyItemByElementFormOrMenu = function (elementFormOrMenu)
+{
+    return elementFormOrMenu.getAttribute('data-collection-key');
+}
+
