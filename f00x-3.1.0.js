@@ -31,12 +31,20 @@ f00x.swap.prototype.sendPostFromFormData = function (formData)
     link.send(formData);
     return link;
 }
-f00x.swap.prototype.sendPostFromObject = function (obj)
+f00x.swap.prototype.sendPostFromObject = function (obj,isSplitArrayAsForm)
 {
     var formData = new FormData();
     for (var key in obj)
     {
-        formData.append(key, obj[key]);
+        if (obj[key] instanceof Array&&isSplitArrayAsForm) {
+                    console.log(obj[key]);
+                    obj[key].forEach(function(item){
+                      formData.append( key, item);
+                    })    
+        } else
+        {
+            formData.append(key, obj[key]);
+        }
     }
     return this.sendPostFromFormData(formData)
 }
@@ -69,7 +77,7 @@ f00x.swap.prototype.sendFile = function (file, postNameFiled, progressBar, isFil
         link.upload.addEventListener('progress', function (event) {
             progressBar.totalValue = event.total;
             progressBar.setCurrentValue(event.loaded);
-           
+
         });
     }
     link.open("POST", this.url, true);
@@ -413,7 +421,7 @@ f00x.scroll.horisontal.setScroll = function (value)
     window.scrollTo(value, f00x.scroll.vertical.getScroll())
 }
 
-f00x.element={}
+f00x.element = {}
 f00x.element.show = function (element)
 {
     element.classList.remove('hidden');
