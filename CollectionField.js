@@ -60,6 +60,7 @@ f00x.CollectionField.prototype.init = function (callBackTextMenuItem, callBackDe
     }
     var self = this
     this.listChildrenElementForms.forEach(function (ElementChildrenForm, keyElement) {
+        if(ElementChildrenForm instanceof Element){
         ElementChildrenForm.setAttribute('data-collection-key', keyElement);
 
         var textMenuItem = self.callBackTextMenuItem(ElementChildrenForm)
@@ -68,6 +69,7 @@ f00x.CollectionField.prototype.init = function (callBackTextMenuItem, callBackDe
         self.elementMenu.appendChild(elementMenuItem);
 
         self.formItemInit(ElementChildrenForm);
+    }
     })
 
     this.elementPanelBody.appendChild(this.elementMenu);
