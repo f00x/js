@@ -206,7 +206,7 @@ f00x.CollectionField.prototype.editClick = function (elementMenuItem)
 
     f00x.element.show(this.listChildrenElementForms[key]);
     f00x.element.hide(this.elementMenu);
-    this.elementButtonAdd.disabled = true;
+    this.elementButtonAdd.setAttribute('disabled',true);
 }
 f00x.CollectionField.prototype.deleteClick = function (elementMenuItem)
 {
@@ -260,7 +260,7 @@ f00x.CollectionField.prototype.saveAndCloseClick = function (elementFormItem)
     f00x.element.hide(elementFormItem);
     this.updateMenuItem(elementFormItem);
     f00x.element.show(this.elementMenu);
-    this.elementButtonAdd.disabled = false;
+    this.elementButtonAdd.removeAttribute('disabled');
     
 
 
