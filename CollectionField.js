@@ -127,7 +127,16 @@ f00x.CollectionField.prototype.distributionElements = function ()
 {
     this.elementBase = this.elementListBox.parentNode;
     this.elementLableBase = this.elementBase.querySelector('label');
-    this.listChildrenElementForms = Array.prototype.slice.call(this.elementListBox.childNodes);
+    this.listChildrenElementForms=[];
+    var list=this.listChildrenElementForms;
+    this.elementListBox.childNodes.forEach(function(v){
+        if(v instanceof Element){
+            list.push(v);
+        }
+        
+    })
+//    this.listChildrenElementForms = Array.prototype.slice.call(this.elementListBox.childNodes);
+    
 }
 f00x.CollectionField.prototype.createPanelHead = function ()
 {
@@ -358,6 +367,7 @@ f00x.CollectionField.prototype.validateAllItemsForm = function () {
 f00x.CollectionField.prototype.validateItemForm = function (key)
 {
     var element = this.listChildrenElementForms[key];
+    
     var InputArray = Array.from(element.querySelectorAll('[required]'));
 
     var valid = true
@@ -376,6 +386,7 @@ f00x.CollectionField.prototype.validateItemForm = function (key)
         this.removeErrorItem(key);
     }
     return valid;
+    
 }
 f00x.CollectionField.prototype.getKeyItemByElementFormOrMenu = function (elementFormOrMenu)
 {
