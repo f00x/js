@@ -5,8 +5,9 @@
  *
  */
 f00x = (typeof (f00x) != "undefined" && f00x instanceof Object) ? f00x : {};
-f00x.SelectMultiple = function (elementSelect, elementLabel, callBackTextItem, isVisibleEditListButton, isVisibleAddButton,isMouseCtrlActive) {
-    this.isMouseCtrlActive=isMouseCtrlActive;
+f00x.SelectMultiple = function (elementSelect, elementLabel, callBackTextItem, isVisibleEditListButton, isVisibleAddButton, isMouseCtrlActive) {
+    console.log(this);
+    this.isMouseCtrlActive = isMouseCtrlActive;
     f00x.element.hide(elementSelect);
     if (callBackTextItem instanceof Function) {
         this.callBackTextItem = callBackTextItem;
@@ -72,26 +73,74 @@ f00x.SelectMultiple.prototype.eventAddClick = false;
 f00x.SelectMultiple.prototype.eventEditListButtonClick = false;
 
 f00x.SelectMultiple.prototype.callBackTextItem = false;
-f00x.SelectMultiple.prototype.isMouseCtrlActive=false;
+f00x.SelectMultiple.prototype.isMouseCtrlActive = false;
+f00x.SelectMultiple.prototype.listGroup = {};
+f00x.SelectMultiple.prototype.listItemNonGroup = [];
 
-f00x.SelectMultiple.prototype.initListOptions = function ()
+f00x.SelectMultiple.prototype.CreateAllGroupAndItem = function ()
 {
     var listOptions = this.elementSelect.childNodes;
     this.elementList.innerHTML = '';
+
     for (var key in listOptions)
     {
         if (!isFinite(key))
             break;
         var elementOptions = listOptions[key];
-        var text = this.callBackTextItem(elementOptions);
-        var item = this.createElementItem(key, text);
-        if (elementOptions.selected) {
-            item.classList.add('active')
+        var item = this.createByOptions(elementOptions,key)
+        var groupCode = elementOptions.getAttribute('data-multiple-select-group-code');
+        if (groupCode) {
+            var groupName = elementOptions.getAttribute('data-multiple-select-group-name');
+            groupName = groupName ? groupName : groupCode;
+
+            if (!(this.listGroup[groupCode]  instanceof f00x.SelectMultiple.GroupItem)) {
+                this.listGroup[groupCode] = new f00x.SelectMultiple.GroupItem(groupCode, groupName,this);
+            }
+            this.listGroup[groupCode].addChildrenElement(item);
+
+        } else {
+            this.listItemNonGroup.push(item);
         }
+
+
+        //this.elementList.appendChild(item);
+    }
+
+
+}
+
+f00x.SelectMultiple.prototype.createByOptions = function (elementOptions, key)
+{
+
+    var text = this.callBackTextItem(elementOptions);
+    var item = this.createElementItem(key, text);
+
+    if (elementOptions.selected) {
+        item.classList.add('active')
+    }
+    return item;
+}
+
+
+f00x.SelectMultiple.prototype.initListOptions = function ()
+{
+    this.CreateAllGroupAndItem();
+    this.elementList.innerHTML = '';
+    for (var key in this.listGroup)
+    {
+        var group = this.listGroup[key];
+        var item = group.createElement();
+        this.elementList.appendChild(item);
+    }
+    for (var key in this.listItemNonGroup)
+    {
+        var item = this.listItemNonGroup[key];
         this.elementList.appendChild(item);
     }
 
 }
+
+
 f00x.SelectMultiple.prototype.createElementItem = function (key, text)
 {
     var elementItem = document.createElement('li');
@@ -99,9 +148,9 @@ f00x.SelectMultiple.prototype.createElementItem = function (key, text)
     elementItem.setAttribute('data-SelectMultiple-key', key);
     var self = this;
     elementItem.addEventListener('click', function () {
-        self.selectByKey(key)
+        self.selectByKey(key);
     })
-    if(this.isMouseCtrlActive){
+    if (this.isMouseCtrlActive) {
         elementItem.addEventListener('mouseover', this.mouseGtrlSelection);
     }
     elementItem.innerHTML = text;
@@ -111,13 +160,13 @@ f00x.SelectMultiple.prototype.createElementItem = function (key, text)
 f00x.SelectMultiple.prototype.mouseGtrlSelection = function (event)
 {
     if (event.target != this)
-                    return false;
-                if (this.contains(event.relatedTarget))
-                    return false;
-                if (event.ctrlKey) {
-                    this.click()
-                }
-                
+        return false;
+    if (this.contains(event.relatedTarget))
+        return false;
+    if (event.ctrlKey) {
+        this.click()
+    }
+
 
 }
 f00x.SelectMultiple.prototype.createElementButtonGroup = function ()
@@ -169,17 +218,139 @@ f00x.SelectMultiple.prototype.selectByKey = function (key)
 {
     console.log(this);
     console.log(key);
+    var elementItem=this.getElementByKey(key);
     if (!this.elementSelect.childNodes[key].selected) {
-        this.elementSelect.childNodes[key].selected = true;
-        this.elementList.childNodes[key].classList.add('active');
+        this.elementSelect.childNodes[key].selected = true; 
+        elementItem.classList.add('active');
     } else
     {
         this.elementSelect.childNodes[key].selected = false;
-        this.elementList.childNodes[key].classList.remove('active');
+        elementItem.classList.remove('active');
     }
+    
+    //data-selectmultiple-key="2"
+}
+f00x.SelectMultiple.prototype.getElementByKey = function (key)
+{
+   return this.elementList.querySelector('[data-selectmultiple-key="'+key+'"]');
 }
 
 
-f00x.SelectMultiple.prototype.defaultCallBackTextItem=function(element){
+f00x.SelectMultiple.prototype.defaultCallBackTextItem = function (element) {
     return element.innerHTML;
+}
+
+f00x.SelectMultiple.GroupItem = function (key, text, SelectMultiple)
+{
+    this.key = key;
+    this.text = text;
+    this.SelectMultiple = SelectMultiple;
+    this.ListChildrenElement = [];
+
+}
+f00x.SelectMultiple.GroupItem.prototype.SelectMultiple
+f00x.SelectMultiple.GroupItem.prototype.key = false;
+f00x.SelectMultiple.GroupItem.prototype.text = false;
+f00x.SelectMultiple.GroupItem.prototype.ListChildrenElement = [];
+f00x.SelectMultiple.GroupItem.prototype.addChildrenElement = function (element) {
+    this.ListChildrenElement.push(element);
+}
+f00x.SelectMultiple.GroupItem.prototype.createElement = function ()
+{
+    var key = this.key;
+    var text = this.text;
+    var groupItem = document.createElement('li');
+    groupItem.classList.add('list-group-item', 'SelectMultiple_group', 'row');
+    groupItem.setAttribute('data-SelectMultiple-key', key);
+    
+    var elementText = document.createElement('span');
+    elementText.classList.add('SelectMultiple_group_title');
+    elementText.innerHTML = text;
+
+//             groupItem.appendChild(elementText);
+    var elementPanel
+    var elementList = this.createElementList();
+    
+    elementList.classList.add('SelectMultiple_group_list_children');
+    console.log(this);
+    this.ListChildrenElement.forEach(function (elementChildren) {
+        elementList.appendChild(elementChildren);
+    })
+    var elementPanel=this.createElementPanelChild(elementList,elementText);
+    groupItem.appendChild(elementPanel);
+    return groupItem
+}
+
+f00x.SelectMultiple.GroupItem.prototype.createElementPanelChild=function(elementList,elementTextHead)
+{
+     var element = document.createElement('div');
+    element.classList.add('panel', 'panel-info');
+         var elementHead = document.createElement('div');
+    elementHead.classList.add('panel-heading');
+    elementHead.appendChild(elementTextHead);
+    
+    var elementbtnAll=this.createElementButtonSelectAll();
+    elementHead.appendChild(elementbtnAll);
+    element.appendChild(elementHead);   
+    
+    var elementBody = document.createElement('div');
+    elementBody.classList.add('panel-body');
+    element.appendChild(elementBody);
+    elementBody.appendChild(elementList);
+    return element
+    
+}
+f00x.SelectMultiple.GroupItem.prototype.createElementButtonSelectAll = function ()
+{
+    var elementButton = document.createElement('div');
+    elementButton.classList.add('btn', 'btn-success', 'glyphicon', 'glyphicon-ok');
+    var self=this;
+    elementButton.addEventListener('click',function(){
+        self.selectAll(this);
+    });
+
+    return elementButton
+}
+f00x.SelectMultiple.GroupItem.prototype.selectAll = function (button)
+{   
+    var self = this
+    if(button.classList.contains('on_all') ){
+    button.classList.remove('on_all');
+    }else{
+       button.classList.add('on_all'); 
+    }
+    
+    this.ListChildrenElement.forEach(function(ChildrenElement){
+        var key=ChildrenElement.getAttribute('data-selectmultiple-key');
+//        console.log( self.SelectMultiple);
+        if(!button.classList.contains('on_all') ){
+            
+            self.SelectMultiple.elementSelect.childNodes[key].selected=true
+        }else{
+            
+            self.SelectMultiple.elementSelect.childNodes[key].selected=false
+        }
+       
+        self.SelectMultiple.selectByKey(key);
+        
+    })
+}
+
+f00x.SelectMultiple.GroupItem.prototype.createElementButtonDownUp = function ()
+{
+    var elementButton = document.createElement('div');
+    elementButton.classList.add('btn', 'btn-success', 'glyphicon', 'glyphicon-menu-down');
+
+
+    //glyphicon-menu-up
+
+    return elementButton
+}
+
+f00x.SelectMultiple.GroupItem.prototype.createElementList = function ()
+{
+    var elementList = document.createElement('ul');
+    elementList.classList.add('list-group', 'SelectMultiple_group_list');
+    return elementList;
+
 }
