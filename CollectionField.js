@@ -20,6 +20,7 @@ f00x.CollectionField = function (boxListElement, callBackTextMenuItem, labelForm
     this.elementListBox = boxListElement;
     this.name = 'f00x.CollectionField';
     this.init(callBackTextMenuItem, callBackDelete, callBackError);
+    console.log(this);
     return this;
 }
 f00x.CollectionField.prototype.name = false;
@@ -229,10 +230,23 @@ f00x.CollectionField.prototype.deleteClick = function (elementMenuItem)
 f00x.CollectionField.prototype.addClick = function ()
 {
     var formItemHTML = this.elementListBox.getAttribute('data-prototype');
+    var idElement=this.elementListBox.getAttribute('id');
 
     var numberNewElement = this.listChildrenElementForms.length;
+    var Postfixcollection = idElement.replace(/.*_(.*$)/g,'$1');
+    console.log(numberNewElement);
+    console.log(idElement);
+    console.log(Postfixcollection);
     formItemHTML = formItemHTML.replace(/__name__label__/g, this.labelForm);
-    formItemHTML = formItemHTML.replace(/__name__/g, numberNewElement);
+
+    var exprNum = new RegExp('('+Postfixcollection+'_)(__name__)','g');
+
+    formItemHTML = formItemHTML.replace(exprNum, '$1'+numberNewElement);
+
+
+
+    var exprNum2 = new RegExp('(\\['+Postfixcollection+'\\])(\\[__name__\\])','g');
+    formItemHTML = formItemHTML.replace(exprNum2, '$1['+numberNewElement+']');
 
 
     var container = document.createElement('div');
