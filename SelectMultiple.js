@@ -1,6 +1,6 @@
 /*26.07.2017 f00x autor:f00x mail:httpf00x@gmail.com*/
 /*
- * Создаёт список с выделением классы bootstrap, на основе элкмента select 
+ * Создаёт список с выделением классы bootstrap, на основе элкмента select
  * Изменение поля селект производится паралельно.
  *
  */
@@ -9,7 +9,7 @@ f00x.SelectMultiple = function (elementSelect, elementLabel, callBackTextItem, i
     this.listGroup={};
     if(isSelectAllButton||(typeof isSelectAllButton == "undefined")){ isSelectAllButton=true;}
     console.log(this);
-    
+
     this.isMouseCtrlActive = isMouseCtrlActive;
     f00x.element.hide(elementSelect);
     if (callBackTextItem instanceof Function) {
@@ -27,8 +27,8 @@ f00x.SelectMultiple = function (elementSelect, elementLabel, callBackTextItem, i
     var self = this;
     if (isVisibleEditListButton || isVisibleAddButton||isSelectAllButton) {
         this.elementButtonGroup = this.createElementButtonGroup();
-       
-        
+
+
         if (isVisibleAddButton) {
             this.eventAddClick = new f00x.event('AddButtonClick', this);
             this.elementButtonAdd = this.createElementButtonAdd()
@@ -65,7 +65,7 @@ f00x.SelectMultiple = function (elementSelect, elementLabel, callBackTextItem, i
     this.elementBase.appendChild(this.elementBody);
     this.initListOptions()
     this.elementSelect.parentNode.insertBefore(this.elementBase, this.elementSelect);
-    
+
 }
 
 f00x.SelectMultiple.prototype.elementSelect = false;
@@ -153,8 +153,7 @@ f00x.SelectMultiple.prototype.initListOptions = function ()
 
 
 f00x.SelectMultiple.prototype.createElementItem = function (key, text)
-{
-    var elementItem = document.createElement('li');
+{ var elementItem = document.createElement('li');
     elementItem.classList.add('list-group-item', 'SelectMultiple_item', 'row');
     elementItem.setAttribute('data-SelectMultiple-key', key);
     var self = this;
@@ -166,7 +165,6 @@ f00x.SelectMultiple.prototype.createElementItem = function (key, text)
     }
     elementItem.innerHTML = text;
     return elementItem
-
 }
 f00x.SelectMultiple.prototype.mouseGtrlSelection = function (event)
 {
@@ -246,36 +244,36 @@ f00x.SelectMultiple.prototype.selectAll = function (button)
     if(button.classList.contains('on_all') ){
     button.classList.remove('on_all');
     }else{
-       button.classList.add('on_all'); 
+       button.classList.add('on_all');
     }
-    
+
     this.elementSelect.querySelectorAll('option').forEach(function(ChildrenElement,key){
 //        var key=ChildrenElement.getAttribute('data-selectmultiple-key');
 
         if(!button.classList.contains('on_all') ){
            ChildrenElement.selected=true
-        }else{ 
+        }else{
            ChildrenElement.selected=false
         }
-       
+
         self.selectByKey(key);
-        
+
     })
-   
+
 }
 f00x.SelectMultiple.prototype.selectByKey = function (key)
 {
     console.log(this);
     var elementItem=this.getElementByKey(key);
     if (!this.elementSelect.childNodes[key].selected) {
-        this.elementSelect.childNodes[key].selected = true; 
+        this.elementSelect.childNodes[key].selected = true;
         elementItem.classList.add('active');
     } else
     {
         this.elementSelect.childNodes[key].selected = false;
         elementItem.classList.remove('active');
     }
-    
+
     //data-selectmultiple-key="2"
 }
 f00x.SelectMultiple.prototype.getElementByKey = function (key)
@@ -311,7 +309,7 @@ f00x.SelectMultipleGroupItem.prototype.createElement = function ()
     var groupItem = document.createElement('li');
     groupItem.classList.add('list-group-item', 'SelectMultiple_group', 'row');
     groupItem.setAttribute('data-SelectMultiple-key', key);
-    
+
     var elementText = document.createElement('span');
     elementText.classList.add('SelectMultiple_group_title');
     elementText.innerHTML = text;
@@ -319,7 +317,7 @@ f00x.SelectMultipleGroupItem.prototype.createElement = function ()
 //             groupItem.appendChild(elementText);
     var elementPanel
     var elementList = this.createElementList();
-    
+
     elementList.classList.add('SelectMultiple_group_list_children');
 
     this.ListChildrenElement.forEach(function (elementChildren) {
@@ -337,17 +335,17 @@ f00x.SelectMultipleGroupItem.prototype.createElementPanelChild=function(elementL
          var elementHead = document.createElement('div');
     elementHead.classList.add('panel-heading');
     elementHead.appendChild(elementTextHead);
-    
+
     var elementbtnAll=this.createElementButtonSelectAll();
     elementHead.appendChild(elementbtnAll);
-    element.appendChild(elementHead);   
-    
+    element.appendChild(elementHead);
+
     var elementBody = document.createElement('div');
     elementBody.classList.add('panel-body');
     element.appendChild(elementBody);
     elementBody.appendChild(elementList);
     return element
-    
+
 }
 f00x.SelectMultipleGroupItem.prototype.createElementButtonSelectAll = function ()
 {
@@ -361,27 +359,27 @@ f00x.SelectMultipleGroupItem.prototype.createElementButtonSelectAll = function (
     return elementButton
 }
 f00x.SelectMultipleGroupItem.prototype.selectAll = function (button)
-{   
+{
     var self = this
     if(button.classList.contains('on_all') ){
     button.classList.remove('on_all');
     }else{
-       button.classList.add('on_all'); 
+       button.classList.add('on_all');
     }
-    
+
     this.ListChildrenElement.forEach(function(ChildrenElement){
         var key=ChildrenElement.getAttribute('data-selectmultiple-key');
 //        console.log( self.SelectMultiple);
         if(!button.classList.contains('on_all') ){
-            
+
             self.SelectMultiple.elementSelect.childNodes[key].selected=true
         }else{
-            
+
             self.SelectMultiple.elementSelect.childNodes[key].selected=false
         }
-       
+
         self.SelectMultiple.selectByKey(key);
-        
+
     })
 }
 
