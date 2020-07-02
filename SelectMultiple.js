@@ -7,6 +7,7 @@
 f00x = (typeof (f00x) != "undefined" && f00x instanceof Object) ? f00x : {};
 f00x.SelectMultiple = function (elementSelect, elementLabel, callBackTextItem, isVisibleEditListButton, isVisibleAddButton, isMouseCtrlActive,isSelectAllButton) {
     this.listGroup={};
+    this.listItemNonGroup=[];
     if(isSelectAllButton||(typeof isSelectAllButton == "undefined")){ isSelectAllButton=true;}
     console.log(this);
 
